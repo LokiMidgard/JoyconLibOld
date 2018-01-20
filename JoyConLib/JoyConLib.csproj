@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net45</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="JoyCon.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MathFloat" Version="1.0.1" />
+    <PackageReference Include="System.Numerics.Vectors" Version="4.4.0" />
+    
+  </ItemGroup>
+
+</Project>
