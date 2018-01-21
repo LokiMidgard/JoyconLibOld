@@ -10,7 +10,7 @@ namespace JoyCon
     {
         internal static void Log(object v)
         {
-            //System.Diagnostics.Debug.WriteLine(v?.ToString()?? "[NULL]");
+            System.Diagnostics.Debug.WriteLine(v?.ToString()?? "[NULL]");
         }
     }
 }

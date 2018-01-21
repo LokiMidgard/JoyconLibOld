@@ -18,7 +18,7 @@ static    class Quartainion
         /// <returns></returns>
         public static Quaternion LookAt(Vector3 sourcePoint, Vector3 destPoint)
         {
-            Vector3 forwardVector = Vector3.Normalize(destPoint - sourcePoint);
+            var forwardVector = Vector3.Normalize(destPoint - sourcePoint);
 
             float dot = Vector3.Dot(Vector3.UnitX, forwardVector);
 
@@ -32,7 +32,7 @@ static    class Quartainion
             }
 
             float rotAngle = (float)Math.Acos(dot);
-            Vector3 rotAxis = Vector3.Cross(Vector3.UnitX, forwardVector);
+            var rotAxis = Vector3.Cross(Vector3.UnitX, forwardVector);
             rotAxis = Vector3.Normalize(rotAxis);
             return CreateFromAxisAngle(rotAxis, rotAngle);
         }

@@ -21,7 +21,6 @@ namespace JoyCon
         private const ushort vendor_id_ = 0x057e;
         private const ushort product_l = 0x2006;
         private const ushort product_r = 0x2007;
-
         private readonly ObservableCollection<Joycon> j; // Array of all connected Joy-Cons
 
         public ReadOnlyObservableCollection<Joycon> JoyCons { get; }
@@ -42,8 +41,8 @@ namespace JoyCon
             bool isLeft = false;
 
 
-            IntPtr ptr = HIDapi.hid_enumerate(vendor_id, 0x0);
-            IntPtr top_ptr = ptr;
+            var ptr = HIDapi.hid_enumerate(vendor_id, 0x0);
+            var top_ptr = ptr;
 
             if (ptr == IntPtr.Zero)
             {
@@ -78,9 +77,9 @@ namespace JoyCon
                     }
                     if (j.All(x => x.path != enumerate.path))
                     {
-                        IntPtr handle = HIDapi.hid_open_path(enumerate.path);
+                        var handle = HIDapi.hid_open_path(enumerate.path);
                         HIDapi.hid_set_nonblocking(handle, 1);
-                        j.Add(new Joycon(handle, EnableIMU, EnableLocalize & EnableIMU, 0.04f, isLeft, enumerate.path));
+                        j.Add(new Joycon(handle, EnableIMU, EnableLocalize & EnableIMU, 0.04f, isLeft, enumerate.path,this));
                     }
 
                 }
@@ -91,23 +90,22 @@ namespace JoyCon
             for (int i = 0; i < j.Count; ++i)
             {
                 Debug.Log(i);
-                Joycon jc = j[i];
+                var jc = j[i];
                 if (jc.state == Joycon.state_.NOT_ATTACHED)
                 {
                     byte LEDs = 0x0;
                     LEDs |= (byte)(0x1 << i);
-                    jc.Attach(leds_: LEDs);
-                    jc.Begin();
+                    jc.Attach(LEDs);
                 }
             }
         }
 
-        public void Update()
+        public void Update(TimeSpan delta)
         {
             for (int i = 0; i < j.Count; ++i)
             {
-                Joycon jc = j[i];
-                jc.Update();
+                var jc = j[i];
+                jc.Update(delta);
             }
         }
 
@@ -124,10 +122,12 @@ namespace JoyCon
                 {
                     for (int i = 0; i < j.Count; ++i)
                     {
-                        Joycon jc = j[i];
+                        var jc = j[i];
                         jc.Detach();
                     }
                 }
+
+                HIDapi.hid_exit();
 
                 disposedValue = true;
             }
@@ -146,6 +146,11 @@ namespace JoyCon
             Dispose(true);
             // TODO: Auskommentierung der folgenden Zeile aufheben, wenn der Finalizer weiter oben überschrieben wird.
             // GC.SuppressFinalize(this);
+        }
+
+        internal void RemoveJoyCon(Joycon joycon)
+        {
+            this.j.Remove(joycon);
         }
         #endregion
     }
