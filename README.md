@@ -1,13 +1,10 @@
 # JoyconLib
 
-![Imgur](https://i.imgur.com/BbV6Srg.gif)
+[![Build status](https://ci.appveyor.com/api/projects/status/2rgvq22xr1ua5y8u?svg=true)](https://ci.appveyor.com/project/LokiMidgard/joyconlib)
+[![NuGet](https://img.shields.io/nuget/v/JoyConLib.svg?style=flat-square)](https://www.nuget.org/packages/JoyConLib/)
 
-Nintendo Switch Joy-Con library for Unity. Featuring: button/stick polling, HD rumble, and accelerometer data processing.
+This Fork packages the code for normal .Net projects.
 
-To use, add an empty GameObject to your scene and attach JoyconManager.cs. Look at JoyconDemo.cs for sample code to get you up and running.
+Nintendo Switch Joy-Con library. Featuring: button/stick polling, HD rumble, and accelerometer data processing.
 
-With thanks/apologies to [CTCaer](https://github.com/ctcaer/jc_toolkit/), [dekuNukem](https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering), [shinyquagsire23](https://github.com/shinyquagsire23/HID-Joy-Con-Whispering), [mfosse](https://github.com/mfosse/JoyCon-Driver), and [riking](https://github.com/riking/joycon).
-
-Uses C# glue code and [HIDAPI](https://github.com/signal11/hidapi) binaries from [Unity-Wiimote](https://github.com/Flafla2/Unity-Wiimote)
-
-GetVector method (attempt at sensor fusion implementation) is still unreliable! Enable in JoyconManager at your own risk. Sensor fusion code is in Joycon.ProcessIMU. Feel free to submit pull requests; sensor fusion code based on [this guide](starlino.com/imu_guide.html).
+I'm refactoring only the code. The hard work was done by the [Parent Project](https://github.com/Looking-Glass/JoyconLib)
