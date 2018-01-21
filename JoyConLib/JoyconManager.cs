@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace JoyCon
 {
 
-    public class JoyconManager
+    public class JoyconManager : IDisposable
     {
 
         // Settings accessible via Unity
@@ -20,30 +22,25 @@ namespace JoyCon
         private const ushort product_l = 0x2006;
         private const ushort product_r = 0x2007;
 
-        public List<Joycon> j; // Array of all connected Joy-Cons
-        static JoyconManager instance;
+        private readonly ObservableCollection<Joycon> j; // Array of all connected Joy-Cons
 
-        public static JoyconManager Instance
+        public ReadOnlyObservableCollection<Joycon> JoyCons { get; }
+
+
+        public JoyconManager()
         {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new JoyconManager();
-                    instance.Awake();
-                }
-                return instance;
-            }
+            j = new ObservableCollection<Joycon>();
+            HIDapi.hid_init();
+            JoyCons = new ReadOnlyObservableCollection<Joycon>(j);
         }
 
-        private void Awake()
+
+
+        public void RefreshJoyConList()
         {
 
-            int i = 0;
-
-            j = new List<Joycon>();
             bool isLeft = false;
-            HIDapi.hid_init();
+
 
             IntPtr ptr = HIDapi.hid_enumerate(vendor_id, 0x0);
             IntPtr top_ptr = ptr;
@@ -79,26 +76,29 @@ namespace JoyCon
                     {
                         Debug.Log("Non Joy-Con input device skipped.");
                     }
-                    IntPtr handle = HIDapi.hid_open_path(enumerate.path);
-                    HIDapi.hid_set_nonblocking(handle, 1);
-                    j.Add(new Joycon(handle, EnableIMU, EnableLocalize & EnableIMU, 0.04f, isLeft));
-                    ++i;
+                    if (j.All(x => x.path != enumerate.path))
+                    {
+                        IntPtr handle = HIDapi.hid_open_path(enumerate.path);
+                        HIDapi.hid_set_nonblocking(handle, 1);
+                        j.Add(new Joycon(handle, EnableIMU, EnableLocalize & EnableIMU, 0.04f, isLeft, enumerate.path));
+                    }
+
                 }
                 ptr = enumerate.next;
             }
             HIDapi.hid_free_enumeration(top_ptr);
-        }
 
-        public void Start()
-        {
             for (int i = 0; i < j.Count; ++i)
             {
                 Debug.Log(i);
                 Joycon jc = j[i];
-                byte LEDs = 0x0;
-                LEDs |= (byte)(0x1 << i);
-                jc.Attach(leds_: LEDs);
-                jc.Begin();
+                if (jc.state == Joycon.state_.NOT_ATTACHED)
+                {
+                    byte LEDs = 0x0;
+                    LEDs |= (byte)(0x1 << i);
+                    jc.Attach(leds_: LEDs);
+                    jc.Begin();
+                }
             }
         }
 
@@ -111,13 +111,42 @@ namespace JoyCon
             }
         }
 
-        public void OnApplicationQuit()
+
+        #region IDisposable Support
+        private bool disposedValue = false; // Dient zur Erkennung redundanter Aufrufe.
+
+
+        protected virtual void Dispose(bool disposing)
         {
-            for (int i = 0; i < j.Count; ++i)
+            if (!disposedValue)
             {
-                Joycon jc = j[i];
-                jc.Detach();
+                if (disposing)
+                {
+                    for (int i = 0; i < j.Count; ++i)
+                    {
+                        Joycon jc = j[i];
+                        jc.Detach();
+                    }
+                }
+
+                disposedValue = true;
             }
         }
+
+        // TODO: Finalizer nur überschreiben, wenn Dispose(bool disposing) weiter oben Code für die Freigabe nicht verwalteter Ressourcen enthält.
+        // ~JoyconManager() {
+        //   // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
+        //   Dispose(false);
+        // }
+
+        // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
+        public void Dispose()
+        {
+            // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
+            Dispose(true);
+            // TODO: Auskommentierung der folgenden Zeile aufheben, wenn der Finalizer weiter oben überschrieben wird.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

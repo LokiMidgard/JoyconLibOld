@@ -1,13 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net45</TargetFrameworks>
+    <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>0.0.1.2</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="win32\hidapi.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="win32\hidapi.dll">
+      <Pack>true</Pack>
+      <PackagePath>build/x86</PackagePath>
+    </Content>
+    <Content Include="win64\hidapi.dll">
+      <Pack>true</Pack>
+      <PackagePath>build/x64</PackagePath>
+    </Content>
+    <None Include="JoyConLib.targets">
+      <Pack>true</Pack>
+      <PackagePath>build</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MathFloat" Version="1.0.1" />
     <PackageReference Include="System.Numerics.Vectors" Version="4.4.0" />
-    
   </ItemGroup>
 
 </Project>

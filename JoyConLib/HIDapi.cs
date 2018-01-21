@@ -5,12 +5,17 @@ using System.Text;
 
 
 public class HIDapi {
-#if x64
-    private const string path = @"win64\hidapi.dll";
-#else
-    private const string path = @"win32\hidapi";
+    //#if x64
+    //    private const string path = @"win64\hidapi.dll";
+    //#else
+    //    private const string path = @"win32\hidapi";
+    //    private const CallingConvention callConvention = CallingConvention.Cdecl;
+    //#endif
+
+    private const string path = @"hidapi";
     private const CallingConvention callConvention = CallingConvention.Cdecl;
-#endif
+
+
     [DllImport(path, CallingConvention = callConvention)]
     public static extern int hid_init();
 

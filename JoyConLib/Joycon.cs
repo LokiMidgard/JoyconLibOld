@@ -8,7 +8,6 @@ using System;
 using System.Threading;
 using System.Numerics;
 using MathFloat;
-//using UnityEngine;
 
 namespace JoyCon
 {
@@ -26,6 +25,8 @@ namespace JoyCon
         };
         public DebugType debug_type = DebugType.IMU;
         public bool isLeft;
+        public readonly string path;
+
         public enum state_ : uint
         {
             NOT_ATTACHED,
@@ -194,7 +195,7 @@ namespace JoyCon
         private byte global_count = 0;
         private string debug_str;
 
-        public Joycon(IntPtr handle_, bool imu, bool localize, float alpha, bool left)
+        public Joycon(IntPtr handle_, bool imu, bool localize, float alpha, bool left, string path)
         {
             handle = handle_;
             imu_enabled = imu;
@@ -202,6 +203,7 @@ namespace JoyCon
             rumble_obj = new Rumble(160, 320, 0);
             filterweight = alpha;
             isLeft = left;
+            this.path = path;
         }
         public void DebugPrint(String s, DebugType d)
         {
