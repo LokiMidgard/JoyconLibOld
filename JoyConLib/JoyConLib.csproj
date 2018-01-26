@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net45;netstandard2.0</TargetFrameworks>
-    <Version>0.0.1.4</Version>
+    <Version>0.0.1.5</Version>
     <PackageLicenseUrl>https://github.com/LokiMidgard/JoyconLib/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/LokiMidgard/JoyconLib</PackageProjectUrl>
     <RepositoryUrl>https://github.com/LokiMidgard/JoyconLib.git</RepositoryUrl>
