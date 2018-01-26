@@ -93,9 +93,7 @@ namespace JoyCon
                 var jc = j[i];
                 if (jc.state == Joycon.state_.NOT_ATTACHED)
                 {
-                    byte LEDs = 0x0;
-                    LEDs |= (byte)(0x1 << i);
-                    jc.Attach(LEDs);
+                    jc.Attach(i);
                 }
             }
         }
@@ -120,11 +118,8 @@ namespace JoyCon
             {
                 if (disposing)
                 {
-                    for (int i = 0; i < j.Count; ++i)
-                    {
-                        var jc = j[i];
-                        jc.Detach();
-                    }
+                    while (j.Count>0)
+                        j[0].Detach();
                 }
 
                 HIDapi.hid_exit();

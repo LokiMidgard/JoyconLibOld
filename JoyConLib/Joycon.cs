@@ -324,7 +324,7 @@ namespace JoyCon
         /// </summary>
         /// <param name="leds_">The initial LED configuration</param>
         /// <returns></returns>
-        internal int Attach(byte leds_ = 0x0)
+        internal int Attach(int playerNumber= 0x0)
         {
             this.state = state_.ATTACHED;
             byte[] a = { 0x0 };
@@ -334,6 +334,9 @@ namespace JoyCon
             a[0] = 0x1;
             dump_calibration_data();
             // Connect
+            byte leds_ = 0x0;
+            //leds_ |= (byte)((0x1 << playerNumber) & 0b1111);
+            leds_ |= (byte)(playerNumber+1);
 
             a[0] = leds_;
             Subcommand(Subcommands.SET_PLAYER_LED, a);
@@ -343,7 +346,7 @@ namespace JoyCon
 
             Begin();
 
-            SetRumble(160, 320, 0.2f, 200);
+            //SetRumble(160, 320, 0.2f, 200);
 
             DebugPrint("Done with init.", DebugType.COMMS);
             return 0;
@@ -411,8 +414,12 @@ namespace JoyCon
         private void Poll()
         {
             int attempts = 0;
+            var time= DateTime.Now;
+            DateTime oldTime;
             while (!this.stop_polling & this.state > state_.NO_JOYCONS)
             {
+                oldTime = time;
+                time = DateTime.Now;
                 SendRumble(this.rumble_obj.GetData());
                 int a = ReceiveRaw();
 
@@ -433,6 +440,19 @@ namespace JoyCon
                     Thread.Sleep((Int32)5);
                 }
                 ++attempts;
+                if (this.rumble_obj.timed_rumble)
+                {
+                    if (this.rumble_obj.t < 0)
+                    {
+                        //throw new Exception();
+                        this.rumble_obj.set_vals(160, 320, 0, 0);
+                    }
+                    else
+                    {
+                        var delta = time - oldTime;
+                        this.rumble_obj.t -= (float)delta.TotalMilliseconds;
+                    }
+                }
             }
             DebugPrint("End poll loop.", DebugType.THREADING);
         }
@@ -467,18 +487,7 @@ namespace JoyCon
                     this.ts_prev = rep.GetTime();
                 }
                 ProcessButtonsAndStick(report_buf);
-                if (this.rumble_obj.timed_rumble)
-                {
-                    if (this.rumble_obj.t < 0)
-                    {
-                        //throw new Exception();
-                        this.rumble_obj.set_vals(160, 320, 0, 0);
-                    }
-                    else
-                    {
-                        this.rumble_obj.t -= (float)delta.TotalMilliseconds;
-                    }
-                }
+                
             }
         }
         private int ProcessButtonsAndStick(byte[] report_buf)
